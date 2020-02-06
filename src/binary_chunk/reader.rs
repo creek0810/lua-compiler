@@ -1,5 +1,7 @@
 use crate::binary_chunk::header;
 use crate::binary_chunk::prototype;
+use crate::vm::instruction::Instruction;
+use crate::vm::opcodes;
 
 pub struct Reader {
     data: Vec<u8>,
@@ -178,6 +180,7 @@ impl Reader {
 
     // print function
     pub fn print_content(&mut self, cur_proto: &prototype::Prototype) {
+        println!("");
         self.print_header(cur_proto);
         self.print_code(cur_proto);
         self.print_detail(cur_proto);
@@ -228,12 +231,55 @@ impl Reader {
             if cur_proto.line_info.len() > 0 {
                 line = cur_proto.line_info[pc].to_string();
             }
-            println!(
-                "\t{}\t[{}]\t0x{:08X}",
+            print!(
+                "\t{}\t[{}]\t{}\t",
                 pc + 1,
                 line,
-                cur_proto.code[pc]
-            )
+                cur_proto.code[pc].opname()
+            );
+            self.print_operands(cur_proto.code[pc]);
+            println!("");
+        }
+    }
+
+    pub fn print_operands(&mut self, instr: u32) {
+        match instr.opmode() {
+            opcodes::IABC => {
+                let (a, b, c) = instr.ABC();
+                print!("{}", a);
+                if instr.b_mode() != opcodes::OP_ARG_N{
+                    if b > 0xFF {
+                        print!(" {}", -1 - (b & 0xFF));
+                    } else {
+                        print!(" {}", b);
+                    }
+                }
+                if instr.c_mode() != opcodes::OP_ARG_N{
+                    if c > 0xFF {
+                        print!(" {}", -1 - (c & 0xFF));
+                    } else {
+                        print!(" {}", c);
+                    }
+                }
+            },
+            opcodes::IABx => {
+                let (a, bx) = instr.ABx();
+                print!("{}", a);
+                if instr.b_mode() == opcodes::OP_ARG_K {
+                    print!(" {}", -1-bx);
+                } else if instr.b_mode() == opcodes::OP_ARG_U {
+                    print!(" {}", bx);
+                }
+            },
+            opcodes::IAsBx => {
+                let (a, sbx) = instr.AsBx();
+                print!("{} {}", a, sbx);
+            },
+            opcodes::IAx => {
+                let ax = instr.Ax();
+                print!("{}", -1 - ax);
+            },
+            _ => print!("not exist")
         }
     }
 
@@ -281,55 +327,54 @@ impl Reader {
             Boolean(a) => print!("{}", a),
             Integer(b) => print!("{}", b),
             Number(c) => print!("{}", c),
-            LuaStr(d) => print!("{}", d),
-            _ => print!("?")
+            LuaStr(d) => print!("\"{}\"", d),
         }
     }
 
     // another
     pub fn check_header(&mut self) {
         assert_eq!(
-            self.read_bytes(4), header::header.signature,
+            self.read_bytes(4), header::HEADER.signature,
             "not a pre compiled chunk!"
         );
         assert_eq!(
-            self.read_byte(), header::header.version,
+            self.read_byte(), header::HEADER.version,
             "version mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::header.format,
+            self.read_byte(), header::HEADER.format,
             "format mismatch!"
         );
         assert_eq!(
-            self.read_bytes(6), header::header.luac_data,
+            self.read_bytes(6), header::HEADER.luac_data,
             "corrupted!"
         );
         assert_eq!(
-            self.read_byte(), header::header.cint_size,
+            self.read_byte(), header::HEADER.cint_size,
             "int size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::header.sizet_size,
+            self.read_byte(), header::HEADER.sizet_size,
             "size_t size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::header.instruction_size,
+            self.read_byte(), header::HEADER.instruction_size,
             "instruction size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::header.lua_integer_size,
+            self.read_byte(), header::HEADER.lua_integer_size,
             "lua_integer size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::header.lua_number_size,
+            self.read_byte(), header::HEADER.lua_number_size,
             "lua_number size mismatch!"
         );
         assert_eq!(
-            self.read_lua_integer(), header::header.luac_int,
+            self.read_lua_integer(), header::HEADER.luac_int,
             "endianness mismatch!"
         );
         assert_eq!(
-            self.read_lua_number(), header::header.luac_num,
+            self.read_lua_number(), header::HEADER.luac_num,
             "float format mismatch!"
         );
     }

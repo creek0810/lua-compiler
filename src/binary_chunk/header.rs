@@ -12,7 +12,7 @@ pub struct Header {
     pub luac_num: f64,
 }
 
-pub const header: Header = Header {
+pub const HEADER: Header = Header {
     signature: [0x1B, 0x4C, 0x75, 0x61],
     version: 0x53,
     format: 0x00,
