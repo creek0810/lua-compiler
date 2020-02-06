@@ -6,7 +6,7 @@ pub trait Instruction {
     fn ABC(self) -> (isize, isize, isize);
     fn ABx(self) -> (isize, isize);
     fn AsBx(self) -> (isize, isize);
-    fn Ax(self) ->(isize);
+    fn Ax(self) -> isize;
     fn opcode(self) -> u8;
     fn opname(self) -> &'static str;
     fn opmode(self) -> u8;
