@@ -2,6 +2,7 @@ mod binary_chunk;
 mod vm;
 mod state;
 mod api;
+mod number;
 use crate::api::api_stack::LuaAPI;
 use crate::api::consts::*;
 use crate::state::lua_state::LuaState;
@@ -34,35 +35,30 @@ fn print_stack(cur_state: &LuaState) {
 }
 
 fn main() -> io::Result<()> {
-    let mut my_state = LuaState::new();
+    let mut ls = LuaState::new();
+    // init value
+    ls.push_integer(1);
+    ls.push_string(String::from("2.0"));
+    ls.push_string(String::from("3.0"));
+    ls.push_number(4.0);
+    print_stack(&ls);
 
+    // start arith
+    ls.arith(LUA_OPADD);
+    print_stack(&ls);
 
-    my_state.push_boolean(true);
-    print_stack(&my_state);
+    ls.arith(LUA_OPBNOT);
+    print_stack(&ls);
 
-    my_state.push_integer(10);
-    print_stack(&my_state);
+    ls.len(2);
+    print_stack(&ls);
 
-    my_state.push_nil();
-    print_stack(&my_state);
+    ls.concat(3);
+    print_stack(&ls);
 
-    my_state.push_string(String::from("hello"));
-    print_stack(&my_state);
-
-    my_state.push_value(-4);
-    print_stack(&my_state);
-
-    my_state.replace(3);
-    print_stack(&my_state);
-
-    my_state.set_top(6);
-    print_stack(&my_state);
-
-    my_state.remove(-3);
-    print_stack(&my_state);
-
-    my_state.set_top(-5);
-    print_stack(&my_state);
+    let result = ls.compare(1, 2, LUA_OPEQ);
+    ls.push_boolean(result);
+    print_stack(&ls);
 
     Ok(())
 }

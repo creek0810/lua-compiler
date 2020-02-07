@@ -55,7 +55,7 @@ impl LuaAPI for LuaState {
     }
 
     fn pop(&mut self, size: usize) {
-        for i in 0..size {
+        for _ in 0..size {
             self.stack.pop();
         }
     }
