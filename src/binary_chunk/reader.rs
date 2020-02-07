@@ -1,5 +1,7 @@
 use crate::binary_chunk::header;
 use crate::binary_chunk::prototype;
+use crate::binary_chunk::prototype::Tag;
+
 use crate::vm::instruction::Instruction;
 use crate::vm::opcodes;
 
@@ -114,14 +116,14 @@ impl Reader {
     }
 
     pub fn read_constant(&mut self) -> prototype::Constant {
-        let const_type:u8 = self.read_byte();
+        let const_type: Tag = Tag::from(self.read_byte());
         match const_type {
-            prototype::TAG_NIL => prototype::Constant::Nil,
-            prototype::TAG_BOOLEAN => prototype::Constant::Boolean(self.read_byte() != 0),
-            prototype::TAG_INTEGER => prototype::Constant::Integer(self.read_lua_integer()),
-            prototype::TAG_NUMBER => prototype::Constant::Number(self.read_lua_number()),
-            prototype::TAG_SHORT_STR => prototype::Constant::LuaStr(self.read_string()),
-            prototype::TAG_LONG_STR => prototype::Constant::LuaStr(self.read_string()),
+            Tag::Nil => prototype::Constant::Nil,
+            Tag::Bool => prototype::Constant::Boolean(self.read_byte() != 0),
+            Tag::Integer => prototype::Constant::Integer(self.read_lua_integer()),
+            Tag::Number => prototype::Constant::Number(self.read_lua_number()),
+            Tag::Short_str => prototype::Constant::LuaStr(self.read_string()),
+            Tag::Long_str => prototype::Constant::LuaStr(self.read_string()),
             _ => panic!("unknown type!")
         }
     }
@@ -334,47 +336,47 @@ impl Reader {
     // another
     pub fn check_header(&mut self) {
         assert_eq!(
-            self.read_bytes(4), header::HEADER.signature,
+            self.read_bytes(4), header::SIGNATURE,
             "not a pre compiled chunk!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.version,
+            self.read_byte(), header::VERSION,
             "version mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.format,
+            self.read_byte(), header::FORMAT,
             "format mismatch!"
         );
         assert_eq!(
-            self.read_bytes(6), header::HEADER.luac_data,
+            self.read_bytes(6), header::LUAC_DATA,
             "corrupted!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.cint_size,
+            self.read_byte(), header::CINT_SIZE,
             "int size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.sizet_size,
+            self.read_byte(), header::SIZET_SIZE,
             "size_t size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.instruction_size,
+            self.read_byte(), header::INSTRUCTION_SIZE,
             "instruction size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.lua_integer_size,
+            self.read_byte(), header::LUA_INT_SIZE,
             "lua_integer size mismatch!"
         );
         assert_eq!(
-            self.read_byte(), header::HEADER.lua_number_size,
+            self.read_byte(), header::LUA_NUM_SIZE,
             "lua_number size mismatch!"
         );
         assert_eq!(
-            self.read_lua_integer(), header::HEADER.luac_int,
+            self.read_lua_integer(), header::LUAC_INT,
             "endianness mismatch!"
         );
         assert_eq!(
-            self.read_lua_number(), header::HEADER.luac_num,
+            self.read_lua_number(), header::LUAC_NUM,
             "float format mismatch!"
         );
     }

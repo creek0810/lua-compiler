@@ -1,10 +1,27 @@
 // tag
-pub const TAG_NIL: u8 = 0x00;
-pub const TAG_BOOLEAN: u8 = 0x01;
-pub const TAG_NUMBER: u8 = 0x03;
-pub const TAG_INTEGER: u8 = 0x13;
-pub const TAG_SHORT_STR: u8 = 0x04;
-pub const TAG_LONG_STR: u8 = 0x14;
+#[repr(u8)]
+pub enum Tag {
+    Nil = 0x00,
+    Bool = 0x01,
+    Number = 0x03,
+    Integer = 0x13,
+    Short_str = 0x04,
+    Long_str = 0x14,
+}
+
+impl From<u8> for Tag {
+    fn from(data: u8) -> Self {
+        match data {
+            0x00 => Tag::Nil,
+            0x01 => Tag::Bool,
+            0x03 => Tag::Number,
+            0x13 => Tag::Integer,
+            0x04 => Tag::Short_str,
+            0x14 => Tag::Long_str,
+            _ => panic!("Tag convert fail!")
+        }
+    }
+}
 
 // header
 pub struct UpValue {
