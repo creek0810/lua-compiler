@@ -1,8 +1,17 @@
 use crate::vm::opcodes;
+use crate::api::api_vm::LuaVM;
+
+use crate::vm::inst_load::*;
+use crate::vm::inst_misc::*;
+use crate::vm::inst_operators::*;
+
 const MAXARG_Bx: isize = (1 << 18) - 1;
 const MAXARG_sBx: isize = MAXARG_Bx >> 1;
 
-pub trait Instruction {
+pub type Instruction = u32;
+
+
+pub trait Instruction_impl {
     fn ABC(self) -> (isize, isize, isize);
     fn ABx(self) -> (isize, isize);
     fn AsBx(self) -> (isize, isize);
@@ -12,10 +21,11 @@ pub trait Instruction {
     fn opmode(self) -> u8;
     fn b_mode(self) -> u8;
     fn c_mode(self) -> u8;
+    fn execute(self, vm: &mut LuaVM);
 }
 
 
-impl Instruction for u32 {
+impl Instruction_impl for u32 {
     fn ABC(self) -> (isize, isize, isize) {
         // 000000000 100000000 00000000 000110
         //     b         c        a       op
@@ -58,5 +68,65 @@ impl Instruction for u32 {
 
     fn c_mode(self) -> u8 {
         opcodes::OPCODES[self.opcode() as usize].arg_c_mode
+    }
+
+    fn execute(self, vm: &mut LuaVM) {
+        match self.opcode() {
+            0 => r#move(self, vm), //MOVE
+            1 => loadK(self, vm), //LOADK
+            2 => loadKx(self, vm), // LOADKX
+            3 => load_bool(self, vm),// LOADBOOL
+            4 => load_nil(self, vm), // LOADNIL
+            /*
+            5    GETUPVAL")
+            6    GETTABUP")
+            7    GETTABLE")
+            8    SETTABUP")
+            9    SETUPVAL")
+            10    SETTABLE")
+            11    NEWTABLE")
+            12    SELF    ")
+            */
+            13 => add(self, vm), // ADD
+            14 => sub(self, vm), // SUB
+            15 => mul(self, vm), // MUL
+            16 => r#mod(self, vm), // MOD
+            17 => pow(self, vm), // POW
+            18 => div(self, vm), // DIV
+            19 => idiv(self, vm), // IDIV
+            20 => band(self, vm), // BAND
+            21 => bor(self, vm), // BOR
+            22 => bxor(self, vm), // BXOR
+            23 => shl(self, vm), // SHL
+            24 => shr(self, vm), // SHR
+            25 => unm(self, vm), // UNM
+            26 => bnot(self, vm), // BNOT
+            27 => not(self, vm), // NOT
+            28 => len(self, vm), // LEN
+            29 => concat(self, vm), // CONCAT
+            30 => jmp(self, vm), // JMP
+            31 => eq(self, vm), // EQ
+            32 => lt(self, vm), // LT
+            33 => le(self, vm), // LE
+            34 => test(self, vm), // TEST
+            35 => test_set(self, vm), // TESTSET
+            /*
+            36    CALL    ")
+            37    TAILCALL")
+            38    RETURN  ")
+            */
+            39 => for_loop(self, vm), // FORLOOP
+            40 => for_rep(self, vm), // FORREP
+            _ => panic!("{} todo!", self)
+            /*
+                TFORCALL")
+                "TFORLOOP 
+                SETLIST  "
+                CLOSURE  "
+                VARARG   "
+                XTRAATG ")
+            */
+
+        }
     }
 }

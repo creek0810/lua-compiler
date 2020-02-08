@@ -1,3 +1,3 @@
 pub mod reader;
 mod header;
-mod prototype;
+pub mod prototype;

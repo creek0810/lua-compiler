@@ -5,8 +5,8 @@ pub enum Tag {
     Bool = 0x01,
     Number = 0x03,
     Integer = 0x13,
-    Short_str = 0x04,
-    Long_str = 0x14,
+    ShortStr = 0x04,
+    LongStr = 0x14,
 }
 
 impl From<u8> for Tag {
@@ -16,14 +16,13 @@ impl From<u8> for Tag {
             0x01 => Tag::Bool,
             0x03 => Tag::Number,
             0x13 => Tag::Integer,
-            0x04 => Tag::Short_str,
-            0x14 => Tag::Long_str,
+            0x04 => Tag::ShortStr,
+            0x14 => Tag::LongStr,
             _ => panic!("Tag convert fail!")
         }
     }
 }
 
-// header
 pub struct UpValue {
     pub in_stack: u8,
     pub idx: u8

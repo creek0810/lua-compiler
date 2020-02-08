@@ -2,7 +2,7 @@ use crate::binary_chunk::header;
 use crate::binary_chunk::prototype;
 use crate::binary_chunk::prototype::Tag;
 
-use crate::vm::instruction::Instruction;
+use crate::vm::instruction::Instruction_impl;
 use crate::vm::opcodes;
 
 pub struct Reader {
@@ -122,8 +122,8 @@ impl Reader {
             Tag::Bool => prototype::Constant::Boolean(self.read_byte() != 0),
             Tag::Integer => prototype::Constant::Integer(self.read_lua_integer()),
             Tag::Number => prototype::Constant::Number(self.read_lua_number()),
-            Tag::Short_str => prototype::Constant::LuaStr(self.read_string()),
-            Tag::Long_str => prototype::Constant::LuaStr(self.read_string()),
+            Tag::ShortStr => prototype::Constant::LuaStr(self.read_string()),
+            Tag::LongStr => prototype::Constant::LuaStr(self.read_string()),
             _ => panic!("unknown type!")
         }
     }

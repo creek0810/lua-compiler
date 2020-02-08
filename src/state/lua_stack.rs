@@ -3,6 +3,7 @@ use crate::state::lua_value::LuaValue;
 pub struct LuaStack {
     vec: Vec<LuaValue>,
 }
+
 impl LuaStack {
     pub fn new(size: usize) -> LuaStack {
         LuaStack {

@@ -1,21 +1,24 @@
 use crate::state::lua_stack::LuaStack;
 use crate::state::lua_value::LuaValue;
+use crate::binary_chunk::prototype::Prototype;
 use crate::api::consts::*;
 use crate::api::api_arith::OPS;
 use crate::api::api_arith;
 use crate::api::api_cmp;
 use crate::api::api_stack::LuaAPI;
 
-
-
 pub struct LuaState {
-    pub stack: LuaStack
+    pub stack: LuaStack,
+    pub proto: Prototype,
+    pub pc: isize,
 }
 
 impl LuaState {
-    pub fn new() -> LuaState {
+    pub fn new(size: usize, proto: Prototype) -> LuaState {
         LuaState {
-            stack: LuaStack::new(20)
+            stack: LuaStack::new(size),
+            proto: proto,
+            pc: 0,
         }
     }
 

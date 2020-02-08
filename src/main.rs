@@ -2,14 +2,36 @@ mod binary_chunk;
 mod vm;
 mod state;
 mod api;
-mod number;
 use crate::api::api_stack::LuaAPI;
 use crate::api::consts::*;
 use crate::state::lua_state::LuaState;
+use crate::binary_chunk::prototype::Prototype;
+use crate::vm::instruction::*;
+use crate::api::api_vm::*;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
+fn lua_main(proto: Prototype) {
+    let n_regs = proto.max_stack_size as usize;
+    let mut ls = LuaState::new(n_regs, proto);
+    ls.set_top(n_regs as isize);
+    // while
+    loop {
+        let pc = ls.pc();
+        let inst = ls.fetch();
+        // 38 is return 
+        if inst.opcode() != 38 {
+            inst.execute(&mut ls);
+            print!("[{:02}] {}", pc + 1, inst.opname());
+            print_stack(&ls);
+            println!("");
+        } else {
+            break;
+        }
+    }
+
+}
 
 fn undump(data: Vec<u8>) {
     let mut r = binary_chunk::reader::Reader::new(data);
@@ -35,30 +57,16 @@ fn print_stack(cur_state: &LuaState) {
 }
 
 fn main() -> io::Result<()> {
-    let mut ls = LuaState::new();
-    // init value
-    ls.push_integer(1);
-    ls.push_string(String::from("2.0"));
-    ls.push_string(String::from("3.0"));
-    ls.push_number(4.0);
-    print_stack(&ls);
-
-    // start arith
-    ls.arith(LUA_OPADD);
-    print_stack(&ls);
-
-    ls.arith(LUA_OPBNOT);
-    print_stack(&ls);
-
-    ls.len(2);
-    print_stack(&ls);
-
-    ls.concat(3);
-    print_stack(&ls);
-
-    let result = ls.compare(1, 2, LUA_OPEQ);
-    ls.push_boolean(result);
-    print_stack(&ls);
+    let mut file = File::open("../tests/sum.out")?;
+    let mut data = Vec::new();
+    file.read_to_end(&mut data)?;
+    // undump
+    let mut r = binary_chunk::reader::Reader::new(data);
+    r.check_header();
+    r.read_byte(); // size_upvalues
+    let result = r.read_proto(String::from(""));
+    // r.print_content(&result);
+    lua_main(result);
 
     Ok(())
 }
