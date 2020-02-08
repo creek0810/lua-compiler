@@ -74,7 +74,7 @@ pub const OPCODES: [Opcode; 47] = [
     opcode(0, 1, OP_ARG_R, OP_ARG_N, IAsBx, "FORREP  "),
     opcode(0, 0, OP_ARG_N, OP_ARG_U, IABC, "TFORCALL"),
     opcode(0, 1, OP_ARG_R, OP_ARG_N, IAsBx, "TFORLOOP "),
-    opcode(0, 0, OP_ARG_U, OP_ARG_U, IABC, "SETLIST  "),
+    opcode(0, 0, OP_ARG_U, OP_ARG_U, IABC, "SETLIST "),
     opcode(0, 1, OP_ARG_U, OP_ARG_N, IABx, "CLOSURE  "),
     opcode(0, 1, OP_ARG_U, OP_ARG_N, IABC, "VARARG   "),
     opcode(0, 0, OP_ARG_U, OP_ARG_U, IAx, "EXTRAATG ")

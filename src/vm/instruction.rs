@@ -4,6 +4,7 @@ use crate::api::api_vm::LuaVM;
 use crate::vm::inst_load::*;
 use crate::vm::inst_misc::*;
 use crate::vm::inst_operators::*;
+use crate::vm::inst_table::*;
 
 const MAXARG_Bx: isize = (1 << 18) - 1;
 const MAXARG_sBx: isize = MAXARG_Bx >> 1;
@@ -77,16 +78,14 @@ impl Instruction_impl for u32 {
             2 => loadKx(self, vm), // LOADKX
             3 => load_bool(self, vm),// LOADBOOL
             4 => load_nil(self, vm), // LOADNIL
-            /*
-            5    GETUPVAL")
-            6    GETTABUP")
-            7    GETTABLE")
-            8    SETTABUP")
-            9    SETUPVAL")
-            10    SETTABLE")
-            11    NEWTABLE")
-            12    SELF    ")
-            */
+            // 5    GETUPVAL")
+            // 6    GETTABUP")
+            7 => get_table(self, vm), // GETTABLE
+            // 8    SETTABUP")
+            // 9    SETUPVAL")
+            10 => set_table(self, vm), // SETTABLE
+            11 => new_table(self, vm), // NEWTABLE
+            // 12    SELF    ")
             13 => add(self, vm), // ADD
             14 => sub(self, vm), // SUB
             15 => mul(self, vm), // MUL
@@ -117,15 +116,13 @@ impl Instruction_impl for u32 {
             */
             39 => for_loop(self, vm), // FORLOOP
             40 => for_rep(self, vm), // FORREP
+            // 41    TFORCALL")
+            // 42    "TFORLOOP
+            43 => set_list(self, vm), // SETLIST
+            // 44    CLOSURE  "
+            // 45    VARARG   "
+            // 46    XTRAATG ")
             _ => panic!("{} todo!", self)
-            /*
-                TFORCALL")
-                "TFORLOOP 
-                SETLIST  "
-                CLOSURE  "
-                VARARG   "
-                XTRAATG ")
-            */
 
         }
     }

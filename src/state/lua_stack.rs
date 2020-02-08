@@ -10,6 +10,7 @@ impl LuaStack {
             vec: Vec::with_capacity(size)
         }
     }
+
     pub fn check(&mut self, size: usize) {
         self.vec.reserve(size);
     }

@@ -11,7 +11,6 @@ pub trait VmAPI {
     fn fetch(&mut self) -> u32;
     fn get_const(&mut self, idx: isize);
     fn get_rk(&mut self, rk: isize);
-
 }
 
 impl VmAPI for LuaState {

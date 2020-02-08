@@ -20,7 +20,7 @@ fn lua_main(proto: Prototype) {
     loop {
         let pc = ls.pc();
         let inst = ls.fetch();
-        // 38 is return 
+        // 38 is return
         if inst.opcode() != 38 {
             inst.execute(&mut ls);
             print!("[{:02}] {}", pc + 1, inst.opname());
@@ -57,7 +57,7 @@ fn print_stack(cur_state: &LuaState) {
 }
 
 fn main() -> io::Result<()> {
-    let mut file = File::open("../tests/sum.out")?;
+    let mut file = File::open("./tests/test.out")?;
     let mut data = Vec::new();
     file.read_to_end(&mut data)?;
     // undump
